@@ -1,0 +1,1720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TLC — Product Requirements Document</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;1,300&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ─────────────────────────────── */
+:root {
+  --bg:       #0a0908;
+  --bg2:      #111009;
+  --bg3:      #1a1815;
+  --bg4:      #221f1a;
+  --rule:     #2e2b24;
+  --rule2:    #3d3930;
+  --gold:     #c9a84c;
+  --gold2:    #e8c547;
+  --gold3:    #f5d87a;
+  --amber:    #d4813a;
+  --red:      #c44b3a;
+  --green:    #4a8c6a;
+  --blue:     #3a6c9c;
+  --text:     #e8e2d4;
+  --mid:      #9a9282;
+  --muted:    #5a5448;
+  --white:    #f5f0e8;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'IBM Plex Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+  counter-reset: section;
+}
+
+/* ── GRAIN OVERLAY ───────────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 999;
+  opacity: 0.4;
+}
+
+/* ── LAYOUT ──────────────────────────────── */
+.page {
+  max-width: 1080px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 64px 1fr;
+}
+
+.margin-col {
+  border-right: 1px solid var(--rule);
+  padding-top: 160px;
+  position: relative;
+}
+
+.main-col {
+  padding: 0 60px 120px 60px;
+}
+
+/* ── COVER ───────────────────────────────── */
+.cover {
+  grid-column: 1 / -1;
+  padding: 80px 60px 60px 124px;
+  border-bottom: 1px solid var(--rule);
+  position: relative;
+  overflow: hidden;
+}
+
+.cover::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 40%;
+  height: 100%;
+  background: 
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 39px,
+      rgba(201,168,76,0.03) 39px,
+      rgba(201,168,76,0.03) 40px
+    );
+  pointer-events: none;
+}
+
+.doc-class {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.doc-class::before {
+  content: '';
+  display: block;
+  width: 32px;
+  height: 1px;
+  background: var(--gold);
+}
+
+.cover-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(52px, 7vw, 96px);
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -2px;
+  margin-bottom: 12px;
+}
+
+.cover-title .line1 { display: block; color: var(--white); }
+.cover-title .line2 { 
+  display: block; 
+  color: var(--gold); 
+  font-style: italic; 
+  font-size: 0.75em;
+}
+.cover-title .line3 { 
+  display: block; 
+  color: var(--mid); 
+  font-weight: 400;
+  font-size: 0.4em;
+  letter-spacing: 0;
+  margin-top: 16px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-style: normal;
+}
+
+.cover-meta {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+  margin-top: 56px;
+  padding-top: 32px;
+  border-top: 1px solid var(--rule);
+}
+
+.meta-item {}
+
+.meta-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.meta-value {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  color: var(--mid);
+  font-weight: 500;
+}
+
+.meta-value.highlight { color: var(--gold); }
+
+/* ── SECTION NUMBERS IN MARGIN ───────────── */
+.section-num {
+  position: absolute;
+  right: 12px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 1px;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
+
+/* ── ARTICLE HEADERS ─────────────────────── */
+.article {
+  margin-bottom: 80px;
+  padding-top: 60px;
+  border-top: 1px solid var(--rule);
+  position: relative;
+  animation: fadeUp 0.5s ease both;
+}
+
+.article:nth-child(1) { animation-delay: 0.1s; }
+.article:nth-child(2) { animation-delay: 0.2s; }
+.article:nth-child(3) { animation-delay: 0.3s; }
+.article:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.article-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.article-eyebrow::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--rule2);
+}
+
+.article-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(28px, 3.5vw, 42px);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--white);
+  margin-bottom: 20px;
+  letter-spacing: -0.5px;
+}
+
+.article-title em {
+  font-style: italic;
+  color: var(--gold);
+}
+
+.article-lead {
+  font-size: 16px;
+  color: var(--mid);
+  line-height: 1.7;
+  max-width: 640px;
+  margin-bottom: 40px;
+  font-weight: 300;
+}
+
+/* ── BODY TEXT ───────────────────────────── */
+p {
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.8;
+  margin-bottom: 20px;
+  max-width: 680px;
+}
+
+p strong { color: var(--white); font-weight: 600; }
+
+/* ── SUBSECTIONS ─────────────────────────── */
+.subsection {
+  margin-bottom: 40px;
+}
+
+.sub-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold2);
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--rule);
+}
+
+/* ── CALLOUT BLOCKS ──────────────────────── */
+.callout {
+  background: var(--bg3);
+  border-left: 3px solid var(--gold);
+  padding: 20px 24px;
+  margin: 28px 0;
+  border-radius: 0 4px 4px 0;
+  max-width: 680px;
+}
+
+.callout.red { border-left-color: var(--red); }
+.callout.green { border-left-color: var(--green); }
+.callout.blue { border-left-color: var(--blue); }
+
+.callout-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.callout p {
+  margin-bottom: 0;
+  font-size: 13.5px;
+  line-height: 1.7;
+  max-width: none;
+}
+
+/* ── CODE/MONO BLOCKS ────────────────────── */
+.code-block {
+  background: var(--bg4);
+  border: 1px solid var(--rule2);
+  border-radius: 6px;
+  padding: 20px 24px;
+  margin: 24px 0;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--mid);
+  max-width: 680px;
+  overflow-x: auto;
+  white-space: pre;
+}
+
+.code-block .comment { color: var(--muted); }
+.code-block .key { color: var(--gold2); }
+.code-block .val { color: var(--text); }
+.code-block .str { color: var(--green); }
+
+/* ── TABLES ──────────────────────────────── */
+.table-wrap {
+  margin: 28px 0;
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+thead tr {
+  border-bottom: 1px solid var(--rule2);
+}
+
+th {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 10px 16px;
+  text-align: left;
+  font-weight: 400;
+  background: var(--bg3);
+}
+
+td {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(46,43,36,0.6);
+  vertical-align: top;
+  line-height: 1.6;
+  color: var(--text);
+  font-size: 13px;
+}
+
+tr:hover td { background: var(--bg3); }
+
+.td-mono {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--gold2);
+}
+
+.td-muted { color: var(--mid); }
+
+/* ── SERIES CARDS ────────────────────────── */
+.series-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 32px 0;
+  max-width: 760px;
+}
+
+.series-card {
+  background: var(--bg3);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.series-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px;
+  height: 100%;
+  background: var(--series-color, var(--gold));
+}
+
+.series-card:hover {
+  border-color: var(--series-color, var(--gold));
+}
+
+.series-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--series-color, var(--gold));
+  margin-bottom: 8px;
+}
+
+.series-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 8px;
+}
+
+.series-desc {
+  font-size: 12px;
+  color: var(--mid);
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.series-gate {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  padding-top: 12px;
+  border-top: 1px solid var(--rule);
+  line-height: 1.5;
+}
+
+/* ── REPO INTEGRATION CARDS ──────────────── */
+.repo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 28px 0;
+  max-width: 760px;
+}
+
+.repo-card {
+  background: var(--bg3);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 16px 18px;
+  transition: border-color 0.2s;
+}
+
+.repo-card:hover { border-color: var(--rule2); }
+
+.repo-name {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--gold2);
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.repo-tier {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.repo-desc {
+  font-size: 12px;
+  color: var(--mid);
+  line-height: 1.55;
+  margin-bottom: 8px;
+}
+
+.repo-series {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.series-tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  padding: 2px 7px;
+  border-radius: 3px;
+  background: var(--bg4);
+  color: var(--mid);
+}
+
+/* ── ENHANCEMENT TIERS ───────────────────── */
+.tier-section { margin-bottom: 40px; }
+
+.tier-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.tier-badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.tier-badge.essential { background: rgba(196,75,58,0.15); color: #e06050; border: 1px solid rgba(196,75,58,0.3); }
+.tier-badge.table-stakes { background: rgba(212,129,58,0.15); color: #e09050; border: 1px solid rgba(212,129,58,0.3); }
+.tier-badge.hva { background: rgba(74,140,106,0.15); color: #60b080; border: 1px solid rgba(74,140,106,0.3); }
+
+.enhancement-item {
+  background: var(--bg3);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 18px 20px;
+  margin-bottom: 10px;
+  max-width: 720px;
+}
+
+.enh-id {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--gold);
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.enh-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--white);
+  margin-bottom: 6px;
+}
+
+.enh-desc {
+  font-size: 12.5px;
+  color: var(--mid);
+  line-height: 1.65;
+  margin-bottom: 8px;
+}
+
+.enh-meta {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* ── MARKET TABLE ────────────────────────── */
+.competitor-row td:first-child { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--gold2); }
+
+.check { color: var(--green); }
+.cross { color: var(--red); }
+.partial { color: var(--amber); }
+
+/* ── INVARIANT LIST ──────────────────────── */
+.invariant-list {
+  margin: 20px 0;
+  max-width: 680px;
+}
+
+.inv-item {
+  display: flex;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.inv-id {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--gold);
+  font-weight: 600;
+  min-width: 100px;
+  flex-shrink: 0;
+}
+
+.inv-text {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.inv-standard {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* ── ROADMAP TIMELINE ────────────────────── */
+.timeline {
+  position: relative;
+  padding-left: 28px;
+  max-width: 680px;
+  margin: 28px 0;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 8px;
+  bottom: 8px;
+  width: 1px;
+  background: var(--rule2);
+}
+
+.tl-item {
+  position: relative;
+  padding-bottom: 32px;
+}
+
+.tl-item::before {
+  content: '';
+  position: absolute;
+  left: -22px;
+  top: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gold);
+  border: 2px solid var(--bg);
+}
+
+.tl-item.future::before { background: var(--muted); }
+
+.tl-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--gold);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.tl-item.future .tl-label { color: var(--muted); }
+
+.tl-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--white);
+  margin-bottom: 4px;
+}
+
+.tl-desc {
+  font-size: 12.5px;
+  color: var(--mid);
+  line-height: 1.6;
+}
+
+/* ── ANTHROPIC ALIGNMENT ─────────────────── */
+.alignment-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 28px 0;
+  max-width: 760px;
+}
+
+.align-card {
+  background: var(--bg3);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 16px 18px;
+}
+
+.align-standard {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.align-verdict {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.verdict-pass { color: var(--green); }
+.verdict-partial { color: var(--amber); }
+.verdict-fail { color: var(--red); }
+
+.align-note {
+  font-size: 12px;
+  color: var(--mid);
+  line-height: 1.55;
+}
+
+/* ── DIVIDER ─────────────────────────────── */
+hr {
+  border: none;
+  border-top: 1px solid var(--rule);
+  margin: 48px 0;
+}
+
+/* ── PITCH BLOCK ─────────────────────────── */
+.pitch-block {
+  background: var(--bg3);
+  border: 1px solid var(--rule2);
+  border-radius: 8px;
+  padding: 40px;
+  margin: 32px 0;
+  max-width: 720px;
+  position: relative;
+}
+
+.pitch-block::before {
+  content: '"';
+  font-family: 'Playfair Display', serif;
+  font-size: 120px;
+  color: rgba(201,168,76,0.08);
+  position: absolute;
+  top: -20px;
+  left: 20px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.pitch-text {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 400;
+  font-style: italic;
+  line-height: 1.7;
+  color: var(--text);
+  max-width: none;
+  margin-bottom: 16px;
+}
+
+.pitch-source {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* ── NAV SIDEBAR ─────────────────────────── */
+.toc {
+  position: fixed;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  z-index: 10;
+}
+
+.toc-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.toc-dot:hover { background: var(--gold); transform: scale(1.5); }
+
+/* ── FOOTER ──────────────────────────────── */
+.doc-footer {
+  grid-column: 1 / -1;
+  padding: 40px 60px 40px 124px;
+  border-top: 1px solid var(--rule);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-left {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.footer-right {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  text-align: right;
+}
+
+/* ── PRINT / RESPONSIVE ──────────────────── */
+@media (max-width: 768px) {
+  .page { grid-template-columns: 1fr; }
+  .margin-col { display: none; }
+  .cover { padding: 48px 24px; }
+  .main-col { padding: 0 24px 80px; }
+  .cover-meta { grid-template-columns: 1fr 1fr; }
+  .series-grid { grid-template-columns: 1fr; }
+  .repo-grid { grid-template-columns: 1fr 1fr; }
+  .alignment-grid { grid-template-columns: 1fr; }
+  .doc-footer { padding: 32px 24px; flex-direction: column; gap: 12px; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOC DOTS -->
+<nav class="toc">
+  <a class="toc-dot" href="#cover" title="Cover"></a>
+  <a class="toc-dot" href="#product" title="Product Definition"></a>
+  <a class="toc-dot" href="#market" title="Market"></a>
+  <a class="toc-dot" href="#architecture" title="Architecture"></a>
+  <a class="toc-dot" href="#series" title="C-RSP Series"></a>
+  <a class="toc-dot" href="#repos" title="Repo Integrations"></a>
+  <a class="toc-dot" href="#guardian" title="Guardian Mode"></a>
+  <a class="toc-dot" href="#domains" title="Domain Packs"></a>
+  <a class="toc-dot" href="#enhancements" title="Enhancements"></a>
+  <a class="toc-dot" href="#anthropic" title="Anthropic Alignment"></a>
+  <a class="toc-dot" href="#roadmap" title="Roadmap"></a>
+  <a class="toc-dot" href="#metrics" title="Success Metrics"></a>
+</nav>
+
+<div class="page">
+
+<!-- ═══ COVER ═══════════════════════════════════════════════ -->
+<div class="cover" id="cover">
+  <div class="doc-class">Product Requirements Document — v3.0</div>
+  <h1 class="cover-title">
+    <span class="line1">The Living</span>
+    <span class="line2">Constitution</span>
+    <span class="line3">// TLC — Governance OS for Frontier Coding Agents</span>
+  </h1>
+  <div class="cover-meta">
+    <div class="meta-item">
+      <div class="meta-label">Document Status</div>
+      <div class="meta-value highlight">Active — v3.0</div>
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">Program</div>
+      <div class="meta-value">C-RSP Series A–E</div>
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">Author</div>
+      <div class="meta-value">Corey Alejandro</div>
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">Effective</div>
+      <div class="meta-value">April 2026</div>
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">Category</div>
+      <div class="meta-value">AI Safety Infrastructure</div>
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">Target Agents</div>
+      <div class="meta-value">Claude Code · Codex · Gemini</div>
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">Amendment Record</div>
+      <div class="meta-value">A-001 through A-006</div>
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">Truth Surface</div>
+      <div class="meta-value">STATUS.json → README.md</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MARGIN + MAIN ════════════════════════════════════════ -->
+<div class="margin-col">
+  <div class="section-num" style="top: 80px">§ 1.0</div>
+  <div class="section-num" style="top: 440px">§ 2.0</div>
+  <div class="section-num" style="top: 900px">§ 3.0</div>
+</div>
+
+<div class="main-col">
+
+<!-- ─── ARTICLE I: PRODUCT DEFINITION ──────────────────────── -->
+<div class="article" id="product">
+  <div class="article-eyebrow">Article I — Product Definition</div>
+  <h2 class="article-title">A <em>governance compiler,</em><br>not a document.</h2>
+  <p class="article-lead">The Living Constitution is not a policy document, a prompt wrapper, or a runtime filter. It is an executable governance operating system — the only system in the field that governs its own development under the same invariants it enforces on external agents.</p>
+
+  <div class="pitch-block">
+    <p class="pitch-text">The Living Constitution is a governance operating system and development overlay for frontier coding agents and AI product teams. It wraps Claude Code, Codex, and Gemini with constitutional constraints, evidence capture, invariant enforcement, and dual-topology product governance.</p>
+    <div class="pitch-source">// Canonical Product Definition — TLC v3.0</div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Three Roles, One System</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Role</th><th>What It Does</th><th>Where in Repo</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="td-mono">Build-time</td>
+            <td>C-RSP contracts, YAML frontmatter typing, MVDS enforcement, zero-shot build specs. Governs what gets built before a line of code runs.</td>
+            <td class="td-muted">00-constitution/ · projects/c-rsp/ · packages/tlc-governance-kit/</td>
+          </tr>
+          <tr>
+            <td class="td-mono">Runtime-adjacent</td>
+            <td>Guardian mode intercepts agent actions before execution. ConsentChain enforces 7-stage consent gateway. Evidence ledger captures SHA-256 anchored proof.</td>
+            <td class="td-muted">packages/tlc-guardian/ · projects/consentchain/ · src/jail.py</td>
+          </tr>
+          <tr>
+            <td class="td-mono">Portfolio-governance</td>
+            <td>MASTER_PROJECT_INVENTORY.json tracks 20+ slugs. Registry binds external repos. Dual-topology enforces integrated vs standalone distinction. Truth surface is machine-readable.</td>
+            <td class="td-muted">projects/governance/registry.json · STATUS.json · scripts/verify_topology.py</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">The Load-Bearing Insight</div>
+    <p>A constitution defines a <strong>type system for power</strong> — who can do what, under what constraints, with what evidence, through what amendment process. TLC makes that type system executable. The C-RSP series structure (A–E) completes the compiler: Series A gives it a formal grammar, Series B a linker and symbol table, Series C a runtime, Series D a standard library, Series E an IDE.</p>
+    <div class="callout">
+      <div class="callout-label">Structural Principle</div>
+      <p>TLC is self-hosting. Every series adds capability to the governance system and immediately subjects that new capability to the governance system it just extended. This recursive self-application is what makes TLC a <em>living</em> constitution rather than a dead document — and what makes the product positioning credible.</p>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">The Front Door</div>
+    <div class="code-block"><span class="comment">// Authoritative repo entry path — all agents and evaluators start here</span>
+
+<span class="key">README.md</span>  →  <span class="val">STATUS.json</span> (authoritative truth surface)
+                →  <span class="val">STATUS.md</span>  (deterministic render)
+                         ↓
+           <span class="val">MASTER_PROJECT_INVENTORY.json</span>  (inventory truth)
+                         ↓
+           <span class="val">governance/</span>  (live governance: instance, lock, binding)
+                         ↓
+           <span class="val">projects/governance/registry.json</span>  (global registry)
+
+<span class="comment">// The sandbox is NOT the front door — it is the execution substrate.</span>
+<span class="comment">// The control plane UI is NOT the front door — it is a governed surface.</span></div>
+  </div>
+</div>
+
+<!-- ─── ARTICLE II: MARKET ───────────────────────────────────── -->
+<div class="article" id="market">
+  <div class="article-eyebrow">Article II — Market Context</div>
+  <h2 class="article-title">The governance gap<br>is <em>wide open.</em></h2>
+  <p class="article-lead">Only 20% of organizations have mature AI agent governance. 88% report security incidents. 40% of agentic AI projects are projected to be cancelled by 2027 due to weak risk control. TLC addresses the specific gap none of the current market leaders close.</p>
+
+  <div class="subsection">
+    <div class="sub-title">Market Signals</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Signal</th><th>Source</th><th>Implication for TLC</th></tr></thead>
+        <tbody>
+          <tr><td>Only 20% of orgs have mature AI governance models</td><td class="td-muted">Deloitte 2026</td><td class="td-muted">80% of the market is the buying opportunity</td></tr>
+          <tr><td>40% of agentic AI projects cancelled by 2027 due to weak risk control</td><td class="td-muted">Gartner</td><td class="td-muted">Prevention is cheaper than cancellation</td></tr>
+          <tr><td>40% of enterprise apps will include AI agents by end of 2026 (from &lt;5% in 2025)</td><td class="td-muted">Gartner</td><td class="td-muted">TAM is expanding 8× in 12 months</td></tr>
+          <tr><td>US AI Agents market: $2.27B → $69B by 2034 (46% CAGR)</td><td class="td-muted">Demand Sage</td><td class="td-muted">Early positioning compounds</td></tr>
+          <tr><td>$1B in compliance spend by 2030</td><td class="td-muted">Gartner Market Guide</td><td class="td-muted">Domain packs + regulatory mapping = direct revenue</td></tr>
+          <tr><td>EU AI Act classifying compliance AI as high-risk with audit requirements</td><td class="td-muted">Authority Partners</td><td class="td-muted">Evidence ledger + exportable audit format is the buying trigger</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Competitive Landscape — Where TLC Wins</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>System</th><th>Runtime Filter</th><th>Build-time Gov</th><th>Portfolio Gov</th><th>Self-hosting</th><th>Constitutional Layer</th><th>Regulatory Mapping</th></tr></thead>
+        <tbody class="competitor-row">
+          <tr><td>Guardrails AI</td><td class="check">✓</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td></tr>
+          <tr><td>NeMo Guardrails</td><td class="check">✓</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td></tr>
+          <tr><td>Lakera Guard</td><td class="check">✓</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td></tr>
+          <tr><td>AWS Bedrock Guardrails</td><td class="check">✓</td><td class="partial">~</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="partial">~</td></tr>
+          <tr><td>Credo AI</td><td class="cross">✗</td><td class="cross">✗</td><td class="check">✓</td><td class="cross">✗</td><td class="cross">✗</td><td class="check">✓</td></tr>
+          <tr style="background: rgba(201,168,76,0.04);"><td style="color:var(--gold2); font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:600;">TLC (with integrations)</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:12px; color:var(--muted)">✓ Full  · ~ Partial  · ✗ Not present</p>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Buyer Segments</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Segment</th><th>Primary Value</th><th>Entry Point</th><th>Revenue Path</th></tr></thead>
+        <tbody>
+          <tr><td class="td-mono">Frontier Lab Safety Teams</td><td>Only framework aligned with Constitutional AI, emotion vector monitoring, and Anthropic's safety hierarchy. No modification needed for adoption.</td><td class="td-muted">Guardian Lite (advisory mode) → open source</td><td class="td-muted">Research partnership, citation, internal adoption</td></tr>
+          <tr><td class="td-mono">Enterprise Compliance Buyers</td><td>SHA-256 evidence ledger + exportable audit JSON + regulatory-mapped invariants. Directly answers EU AI Act audit requirements.</td><td class="td-muted">SOC 2 / NIST AI RMF domain pack starter kit</td><td class="td-muted">$50–150k/yr per enterprise customer</td></tr>
+          <tr><td class="td-mono">AI Safety Researchers</td><td>Self-hosting proof, open test suite (1,037 LOC + 994 LOC tests), domain pack architecture, emotion vector monitoring integration.</td><td class="td-muted">tlc-governance-kit extractable package</td><td class="td-muted">Citations, fellows program, research grants</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ─── ARTICLE III: ARCHITECTURE ───────────────────────────── -->
+<div class="article" id="architecture">
+  <div class="article-eyebrow">Article III — Architecture</div>
+  <h2 class="article-title">The governance <em>compiler</em><br>stack.</h2>
+  <p class="article-lead">TLC's architecture follows the constitutional compiler metaphor precisely: grammar, linker, runtime, standard library, IDE. Each layer is independently verifiable and the system is self-hosting throughout.</p>
+
+  <div class="subsection">
+    <div class="sub-title">Safety Domains — Constitutional Taxonomy</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Domain</th><th>Invariant Class</th><th>Reference Implementation</th><th>Regulatory Alignment</th></tr></thead>
+        <tbody>
+          <tr><td class="td-mono">Human Safety</td><td>Absence-over-presence signal detection. Consent as precondition. Neurodivergent-first baseline profiling.</td><td class="td-muted">uicare-system (Quintessential Sign-Off)</td><td class="td-muted">NIST AI RMF MAP 1.5, ISO 42001 §6.1.2</td></tr>
+          <tr><td class="td-mono">Cognitive Safety</td><td>Explanations must produce correct mental models, not merely true propositions. Scaffolding failure detection.</td><td class="td-muted">instructional-integrity-ui (ZSB-IIS-v2.0)</td><td class="td-muted">EU AI Act Art. 13 (Transparency), NIST AI RMF GOVERN 1.1</td></tr>
+          <tr><td class="td-mono">Epistemic Safety</td><td>Truth surface enforcement. Evidence chain requirements. Calibration of uncertainty in all outputs.</td><td class="td-muted">PROACTIVE framework · STATUS.json · DOC_TRUTH_HIERARCHY.md</td><td class="td-muted">NIST AI RMF MANAGE 2.2, ISO 42001 §8.4</td></tr>
+          <tr><td class="td-mono">Empirical Safety</td><td>Cryptographic consent for agent actions. 7-stage action gateway. Every action consented, logged, revocable.</td><td class="td-muted">consentchain (7-stage gateway)</td><td class="td-muted">GDPR Art. 7, EU AI Act Art. 9, SOC 2 CC6.3</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Core Invariants — Binary-Verifiable</div>
+    <div class="invariant-list">
+      <div class="inv-item">
+        <div>
+          <div class="inv-id">INVARIANT_01<br>Evidence-First</div>
+        </div>
+        <div>
+          <div class="inv-text">No governance claim is valid without a machine-readable evidence record. Every invariant violation produces a SHA-256 anchored artifact in <code style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--gold2)">docs/evidence/verification/</code>.</div>
+          <div class="inv-standard">CR-2 compliant · NIST AI RMF MEASURE 2.5</div>
+        </div>
+      </div>
+      <div class="inv-item">
+        <div><div class="inv-id">INVARIANT_02<br>Traceability</div></div>
+        <div>
+          <div class="inv-text">Every agent action that modifies a governed artifact must be traceable to a specific invariant check, a specific agent session, and a specific evidence record. No action without a chain.</div>
+          <div class="inv-standard">CR-2 compliant · EU AI Act Art. 12</div>
+        </div>
+      </div>
+      <div class="inv-item">
+        <div><div class="inv-id">INVARIANT_03<br>Safety Over Fluency</div></div>
+        <div>
+          <div class="inv-text">When an agent's fluent output conflicts with a safety constraint, the constraint wins. Guardian mode blocks, not warns. Evidence is captured before the block is surfaced.</div>
+          <div class="inv-standard">Anthropic safety hierarchy §1 (Broadly Safe)</div>
+        </div>
+      </div>
+      <div class="inv-item">
+        <div><div class="inv-id">INVARIANT_04<br>Consent Precedes Action</div></div>
+        <div>
+          <div class="inv-text">No high-stakes agent action executes without explicit consent through the ConsentChain 7-stage gateway. Consent is cryptographically logged and revocable at any stage.</div>
+          <div class="inv-standard">GDPR Art. 7 · EU AI Act Art. 9</div>
+        </div>
+      </div>
+      <div class="inv-item">
+        <div><div class="inv-id">INVARIANT_05<br>Desperation Detection</div></div>
+        <div>
+          <div class="inv-text">Guardian mode monitors for functional desperation-vector activation in governed agents. Elevated desperation state triggers advisory escalation before blocking mode engages. Derived from Anthropic emotion research (April 2, 2026).</div>
+          <div class="inv-standard">Novel — Anthropic emotion research operationalization</div>
+        </div>
+      </div>
+      <div class="inv-item">
+        <div><div class="inv-id">INVARIANT_06<br>Self-Hosting</div></div>
+        <div>
+          <div class="inv-text">TLC's own development is governed by TLC. No series closes without passing the governance verification suite it defines. The framework cannot govern others while failing to govern itself.</div>
+          <div class="inv-standard">CR-5 compliant · Anthropic "show don't tell" standard</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── ARTICLE IV: C-RSP SERIES ─────────────────────────────── -->
+<div class="article" id="series">
+  <div class="article-eyebrow">Article IV — C-RSP Program</div>
+  <h2 class="article-title">Five series.<br><em>One compiler.</em></h2>
+  <p class="article-lead">The C-RSP program is not a roadmap. It is a dependency-locked construction sequence. Each series has binary closure criteria. No series opens before its preconditions are met. The sequence cannot be reordered.</p>
+
+  <div class="subsection">
+    <div class="sub-title">Dependency Map</div>
+    <div class="code-block"><span class="comment">// Series open when their preconditions are verifiably true.
+// Each gate is binary — it passes or it does not.</span>
+
+<span class="key">SERIES A</span> — Constitutional Refactor
+  Precondition: HANDOFF.md freeze + STATUS.json drift resolved
+  <span class="comment">// Housekeeping (A-0) must run before A-1</span>
+  Closes when: THE_LIVING_CONSTITUTION.md contains machine-parseable
+               Domain/Jurisdiction/Institution/Project/Truth Surface
+               declarations AND verify_document_constitution.py exits 0
+
+<span class="key">SERIES B</span> — Taxonomy Topography
+  Precondition: <span class="str">Series A closed</span>
+  Closes when: Every slug in MASTER_PROJECT_INVENTORY.json has
+               a schema-valid entry in registry.json verified by
+               verify_registry_schema.py exiting 0
+
+<span class="key">SERIES C</span> — Overlay Productization (Guardian Mode)
+  Precondition: <span class="str">Series B closed</span>
+  Closes when: Guardian mode blocks a simulated invariant violation
+               AND produces an exportable evidence record
+               <span class="comment">// Codex/Gemini adapter SPECS only — not implementations</span>
+
+<span class="key">SERIES D</span> — Domain Packs
+  Precondition: <span class="str">Series C closed (Claude Guardian working)</span>
+  Closes when: universal-core + 2 domain packs pass Guardian
+               integration tests AND template enables 3rd-party packs
+
+<span class="key">SERIES E</span> — Constitutional UI
+  Precondition: <span class="str">Series D closed (≥1 domain pack shipping)</span>
+  Closes when: npm run build exits 0, UI renders live STATUS.json
+               data, build is governed by C-RSP contract with
+               Guardian enforcement</div>
+  </div>
+
+  <div class="series-grid">
+    <div class="series-card" style="--series-color: #c9a84c">
+      <div class="series-label">Series A</div>
+      <div class="series-name">Constitutional Refactor</div>
+      <div class="series-desc">Rewrite THE_LIVING_CONSTITUTION.md, root CLAUDE.md, TERMINOLOGY.md. Add DOC_TRUTH_HIERARCHY.md Rank 0. Introduce Domain/Jurisdiction/Institution/Project/Truth Surface as machine-parseable constitutional terms.</div>
+      <div class="series-gate">First file: THE_LIVING_CONSTITUTION.md<br>Pre-step A-0: Archive legacy root artifacts</div>
+    </div>
+    <div class="series-card" style="--series-color: #7c6af7">
+      <div class="series-label">Series B</div>
+      <div class="series-name">Taxonomy Topography</div>
+      <div class="series-desc">Create schemas/tlc-registry.schema.json (JSON Schema Draft 2020-12). Migrate registry.json to multi-repo format. Migrate config/domains.ts → config/domains.json. Wire verify_registry_schema.py to CI.</div>
+      <div class="series-gate">Seeded from MASTER_PROJECT_INVENTORY.json via script<br>Closes: all 20 slugs schema-valid</div>
+    </div>
+    <div class="series-card" style="--series-color: #f07060">
+      <div class="series-label">Series C</div>
+      <div class="series-name">Overlay Productization</div>
+      <div class="series-desc">Create packages/tlc-guardian/ wrapping sentinelos kernel. Extend .claude/ for Claude adapter. Promote 05-adapters/ strategy docs to executable adapter specs for Codex + Gemini using UPOS7VS routing patterns.</div>
+      <div class="series-gate">Claude Guardian MVP: single guardian.py<br>Codex/Gemini: adapter specs only</div>
+    </div>
+    <div class="series-card" style="--series-color: #4fd89e">
+      <div class="series-label">Series D</div>
+      <div class="series-name">Domain Packs</div>
+      <div class="series-desc">Extract universal-core pack from existing invariants. Human Safety pack from uicare-system. Cognitive Safety pack from instructional-integrity-ui. Empirical Safety pack from consentchain. Pack template for 3rd parties.</div>
+      <div class="series-gate">SOC 2 + NIST AI RMF starter kit = commercial entry<br>Finance/healthcare packs: Series D+</div>
+    </div>
+    <div class="series-card" style="--series-color: #60b4f0">
+      <div class="series-label">Series E</div>
+      <div class="series-name">Constitutional UI</div>
+      <div class="series-desc">Promote apps/tlc-control-plane/ from scaffold to governed product. Read-only view of governance state. Runs through sandbox execution substrate. Governed by Guardian mode. Renders registry, STATUS.json, and pack status.</div>
+      <div class="series-gate">UI is a governed product — eats its own dog food<br>Front door remains README → STATUS.json</div>
+    </div>
+    <div class="series-card" style="--series-color: #d060f0; grid-column: 2;">
+      <div class="series-label">Pre-Series A-0</div>
+      <div class="series-name">Housekeeping Gate</div>
+      <div class="series-desc">Resolve STATUS.json cross_repo_consistency drift. Archive: crsp_refactor_bundle_final/, _c-rsp/, delegated-whistling-cherny.md, ChatGPT-AI Governance Frameworks.md. Tag rollback anchor before any A-1 writes.</div>
+      <div class="series-gate">MUST complete before A-1 opens<br>Non-optional — truth surface must not show drift at series open</div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── ARTICLE V: REPO INTEGRATIONS ───────────────────────── -->
+<div class="article" id="repos">
+  <div class="article-eyebrow">Article V — Portfolio Integration</div>
+  <h2 class="article-title">Twelve repos.<br><em>One governed OS.</em></h2>
+  <p class="article-lead">TLC's portfolio already contains the domain expertise, enforcement runtime, and adapter infrastructure the Master Plan requires. These are not features to build — they are components to integrate. The repo analysis identified four tiers of integration priority.</p>
+
+  <div class="subsection">
+    <div class="sub-title">Tier 1 — Core Infrastructure (Series A–C)</div>
+    <div class="repo-grid">
+      <div class="repo-card">
+        <div class="repo-name">sentinelos</div>
+        <div class="repo-tier">Tier 1 · Core</div>
+        <div class="repo-desc">6 safety invariants (I1-I6) as executable constraints. TypeScript Turborepo, hexagonal architecture. 1,037 LOC + 994 LOC tests. This IS the Guardian mode kernel.</div>
+        <div class="repo-series">
+          <span class="series-tag">Series C-1</span>
+          <span class="series-tag">Guardian kernel</span>
+        </div>
+      </div>
+      <div class="repo-card">
+        <div class="repo-name">consentchain</div>
+        <div class="repo-tier">Tier 1 · Core</div>
+        <div class="repo-desc">7-stage cryptographic consent gateway. Already a TLC submodule. Empirical Safety domain proof-of-concept. Guardian mode's enforcement loop at action level.</div>
+        <div class="repo-series">
+          <span class="series-tag">Series C</span>
+          <span class="series-tag">Series D-4</span>
+        </div>
+      </div>
+      <div class="repo-card">
+        <div class="repo-name">consent-gateway-auth0</div>
+        <div class="repo-tier">Tier 1 · Core</div>
+        <div class="repo-desc">Auth0-backed gateway for consent and agent actions. Already a TLC submodule. Provides OAuth integration surface for Guardian mode.</div>
+        <div class="repo-series">
+          <span class="series-tag">Series C-2</span>
+          <span class="series-tag">Auth adapter</span>
+        </div>
+      </div>
+      <div class="repo-card">
+        <div class="repo-name">tlc-evidence-observatory</div>
+        <div class="repo-tier">Tier 1 · Infrastructure</div>
+        <div class="repo-desc">Research-grade evidence-to-evals OS for auditable AI failure case construction. Generates Series A amendment record artifacts.</div>
+        <div class="repo-series">
+          <span class="series-tag">Series A-6</span>
+          <span class="series-tag">Evidence tooling</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Tier 2 — Domain Pack Sources (Series D)</div>
+    <div class="repo-grid">
+      <div class="repo-card">
+        <div class="repo-name">uicare-system</div>
+        <div class="repo-tier">Tier 2 · Domain</div>
+        <div class="repo-desc">Absence-over-presence signal detection for neurodivergent developers. Human Safety domain. Explicitly binds I1, I4, I5. Quintessential Sign-Off = canonical Human Safety spec.</div>
+        <div class="repo-series">
+          <span class="series-tag">Series D-2</span>
+          <span class="series-tag">Human Safety pack</span>
+        </div>
+      </div>
+      <div class="repo-card">
+        <div class="repo-name">instructional-integrity-ui</div>
+        <div class="repo-tier">Tier 2 · Domain + Series E</div>
+        <div class="repo-desc">Cognitive Safety evaluation system. Already governed by TLC Articles I–VIII. ZSB-IIS-v2.0. Dual role: domain pack source AND Series E governed product proof.</div>
+        <div class="repo-series">
+          <span class="series-tag">Series D-5</span>
+          <span class="series-tag">Series E proof</span>
+        </div>
+      </div>
+      <div class="repo-card">
+        <div class="repo-name">mad-mall-production</div>
+        <div class="repo-tier">Tier 2 · Series E Primary</div>
+        <div class="repo-desc">Primary TLC use case. 6 apps, 22 packages. Non-clinical by constitutional constraint. Black women with Graves' disease. Proves constitutional governance handles culturally specific constraints.</div>
+        <div class="repo-series">
+          <span class="series-tag">Series E primary</span>
+          <span class="series-tag">Series B registry</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Tier 3 — Adapter Infrastructure (Series C)</div>
+    <div class="repo-grid">
+      <div class="repo-card">
+        <div class="repo-name">Meta-Prompt-Architect</div>
+        <div class="repo-tier">Tier 3 · Adapter</div>
+        <div class="repo-desc">Linear Context Injection (LCI) pattern + model-specific reasoning adapters. Resolves Critical failure E1: LCI IS the Claude Code constitutional injection mechanism.</div>
+        <div class="repo-series">
+          <span class="series-tag">Series C-2</span>
+          <span class="series-tag">Claude adapter spec</span>
+        </div>
+      </div>
+      <div class="repo-card">
+        <div class="repo-name">zero-shot-os-with-upos7vs</div>
+        <div class="repo-tier">Tier 3 · Adapter</div>
+        <div class="repo-desc">Working routing adapters for OpenAI (Codex) + multi-vendor systems. Provides Codex/Gemini adapter spec starting point — not net-new builds.</div>
+        <div class="repo-series">
+          <span class="series-tag">Series C-3</span>
+          <span class="series-tag">Series C-4</span>
+        </div>
+      </div>
+      <div class="repo-card">
+        <div class="repo-name">instructional-integrity-gemini-ui</div>
+        <div class="repo-tier">Tier 3 · Evidence</div>
+        <div class="repo-desc">Gemini variant of the Cognitive Safety evaluation system. Proves the governance layer adapts to Gemini's API surface. Evidence for Series C-4 Gemini adapter spec.</div>
+        <div class="repo-series">
+          <span class="series-tag">Series C-4 evidence</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── ARTICLE VI: GUARDIAN MODE ───────────────────────────── -->
+<div class="article" id="guardian">
+  <div class="article-eyebrow">Article VI — Guardian Mode Specification</div>
+  <h2 class="article-title">The enforcement<br><em>runtime.</em></h2>
+  <p class="article-lead">Guardian mode is TLC's active enforcement layer — the runtime that intercepts agent actions before execution. It resolves the Critical failure E1 from the stakeholder review by specifying the exact interception mechanism: Linear Context Injection at the system-prompt level, not git hooks.</p>
+
+  <div class="subsection">
+    <div class="sub-title">Interception Architecture</div>
+    <div class="callout red">
+      <div class="callout-label">Critical Resolution — E1</div>
+      <p>Pre-commit hooks check committed code, not agent actions in flight. Guardian mode intercepts at the <strong>system-prompt level via Linear Context Injection (LCI)</strong> — inserting invariant checks into the agent's context before any tool call executes. For Claude Code: CLAUDE.md constitutional preamble + LCI. For MCP-based agents: MCP server wrapping the tool-call layer. For standalone agents: guardian.py check(action, context) gate before execution.</p>
+    </div>
+    <div class="code-block"><span class="comment">// packages/tlc-guardian/guardian.py — MVP implementation
+// Single file. Hexagonal core from sentinelos. Loads invariant-registry.json.</span>
+
+<span class="key">import</span> json, hashlib, datetime
+
+<span class="key">class</span> <span class="val">Guardian</span>:
+    <span class="key">def</span> <span class="val">__init__</span>(self, config_path: str):
+        <span class="str">"""Load invariants from registry. Hash config for tamper detection."""</span>
+        self.config = json.load(open(config_path))
+        self.config_hash = hashlib.sha256(
+            open(config_path, <span class="str">'rb'</span>).read()
+        ).hexdigest()
+        self._verify_config_integrity()
+
+    <span class="key">def</span> <span class="val">check</span>(self, action: dict, context: dict) → dict:
+        <span class="str">"""
+        Returns: {allow: bool, evidence: Record, violations: list}
+        Evidence record is SHA-256 anchored and exportable.
+        """</span>
+        violations = self._evaluate_invariants(action, context)
+        evidence = self._build_evidence_record(action, context, violations)
+        <span class="key">return</span> {
+            <span class="str">"allow"</span>: len(violations) == 0,
+            <span class="str">"evidence"</span>: evidence,
+            <span class="str">"violations"</span>: violations
+        }
+
+    <span class="key">def</span> <span class="val">_verify_config_integrity</span>(self):
+        <span class="str">"""INVARIANT_03: Guardian verifies its own config before enforcing."""</span>
+        current = hashlib.sha256(
+            open(self.config_path, <span class="str">'rb'</span>).read()
+        ).hexdigest()
+        <span class="key">if</span> current != self.config_hash:
+            <span class="key">raise</span> <span class="val">GuardianConfigTamperError</span>(<span class="str">"Config modified after load"</span>)</div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Emotion Vector Monitoring — INVARIANT_05</div>
+    <p>Anthropic's April 2, 2026 research confirmed that functional desperation vectors causally increase misaligned behavior (blackmail, reward hacking) even with no overt emotional markers in output. Guardian mode operationalizes this finding as an early-warning monitoring layer — the first governance system to do so.</p>
+    <div class="callout green">
+      <div class="callout-label">Anthropic Research Integration — Emotion Vectors (F2, F4)</div>
+      <p>Guardian Lite mode monitors for context-anxiety signatures (premature task wrap-up, reduced scope, increased hedging) as early indicators of desperation-vector activation. These signals are logged as advisory events before any blocking decision. This operationalizes Anthropic's recommendation that "measuring emotion vector activation could serve as an early warning that the model is poised to express misaligned behavior."</p>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Deployment Modes</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Mode</th><th>Behavior</th><th>Use Case</th><th>Series</th></tr></thead>
+        <tbody>
+          <tr><td class="td-mono">Guardian Lite</td><td>Advisory only. Logs violations, does not block. Suitable for initial adoption.</td><td class="td-muted">First-time adopters, evaluation period</td><td class="td-muted">Series C MVP</td></tr>
+          <tr><td class="td-mono">Guardian Standard</td><td>Blocks on invariant violation. Produces exportable evidence record. Allows with warning on advisor-class findings.</td><td class="td-muted">Development environments, CI/CD</td><td class="td-muted">Series C GA</td></tr>
+          <tr><td class="td-mono">Guardian Strict</td><td>Blocks and escalates on any violation. Step-up authentication required for override. Full audit trail.</td><td class="td-muted">Production environments, regulated industries</td><td class="td-muted">Series D+</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Distribution Mechanism</div>
+    <div class="callout">
+      <div class="callout-label">Critical Resolution — E6</div>
+      <p><strong>Primary:</strong> PyPI package — <code style="font-family:'IBM Plex Mono',monospace">pip install tlc-guardian</code>. Configured via <code style="font-family:'IBM Plex Mono',monospace">tlc-guardian.yaml</code> in target repo root. Invoked via pre-commit hook OR CI step OR MCP server depending on agent type. <strong>Secondary:</strong> GitHub Action <code style="font-family:'IBM Plex Mono',monospace">uses: coreyalejandro/tlc-guardian-action@v1</code>. Extractable without cloning the full TLC repo — follows packages/tlc-governance-kit/ extraction precedent.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ─── ARTICLE VII: DOMAIN PACKS ────────────────────────────── -->
+<div class="article" id="domains">
+  <div class="article-eyebrow">Article VII — Domain Packs</div>
+  <h2 class="article-title">The <em>standard library</em><br>for governance.</h2>
+  <p class="article-lead">Domain packs are composable, parameterized configurations of Guardian mode. Each pack loads a specific invariant set and regulatory mapping into Guardian without modifying core. Universal-core is the base layer all packs inherit.</p>
+
+  <div class="subsection">
+    <div class="sub-title">Pack Architecture</div>
+    <div class="code-block"><span class="comment">// packages/tlc-guardian/packs/ — directory structure</span>
+
+<span class="key">universal-core/</span>
+  ├── invariants.json      <span class="comment"># Governance-chain invariants, truth surface, doc standards</span>
+  ├── regulatory-map.json  <span class="comment"># NIST AI RMF + ISO 42001 base mappings</span>
+  └── pack.schema.json     <span class="comment"># Validates all packs that inherit from this</span>
+
+<span class="key">human-safety/</span>            <span class="comment"># Source: uicare-system</span>
+  ├── invariants.json      <span class="comment"># Absence-over-presence, consent precondition, I1/I4/I5</span>
+  ├── regulatory-map.json  <span class="comment"># NIST AI RMF MAP 1.5, ISO 42001 §6.1.2</span>
+  └── baseline-schema.json <span class="comment"># Quintessential Sign-Off structure</span>
+
+<span class="key">cognitive-safety/</span>        <span class="comment"># Source: instructional-integrity-ui</span>
+  ├── invariants.json      <span class="comment"># Mental model correctness, scaffolding failure detection</span>
+  ├── regulatory-map.json  <span class="comment"># EU AI Act Art. 13, NIST GOVERN 1.1</span>
+  └── rubric-schema.json   <span class="comment"># Evaluation rubric for instructional artifacts</span>
+
+<span class="key">empirical-safety/</span>        <span class="comment"># Source: consentchain</span>
+  ├── invariants.json      <span class="comment"># Cryptographic consent, 7-stage gateway, revocability</span>
+  ├── regulatory-map.json  <span class="comment"># GDPR Art. 7, EU AI Act Art. 9, SOC 2 CC6.3</span>
+  └── gateway-schema.json  <span class="comment"># ConsentChain action schema</span>
+
+<span class="key">epistemic-safety/</span>        <span class="comment"># Source: PROACTIVE + STATUS.json</span>
+  ├── invariants.json      <span class="comment"># Truth surface, evidence chain, calibration requirements</span>
+  └── regulatory-map.json  <span class="comment"># NIST MANAGE 2.2, ISO 42001 §8.4</span>
+
+<span class="key">_template/</span>               <span class="comment"># 3rd party pack creation template</span>
+  ├── pack.schema.json
+  └── PACK_AUTHORING.md    <span class="comment"># Instructions + SOC 2 / NIST AI RMF mapping guide</span></div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Commercial Starter Kits — Series D+</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Kit</th><th>Invariant Coverage</th><th>Regulatory Framework</th><th>Target Buyer</th></tr></thead>
+        <tbody>
+          <tr><td class="td-mono">SOC 2 Type II</td><td>universal-core + empirical-safety + epistemic-safety</td><td class="td-muted">SOC 2 CC6–CC9, Trust Service Criteria</td><td class="td-muted">US enterprise, SaaS, cloud providers</td></tr>
+          <tr><td class="td-mono">NIST AI RMF</td><td>All four safety domains</td><td class="td-muted">GOVERN 1.1, MAP 1.5, MEASURE 2.5, MANAGE 2.2</td><td class="td-muted">US federal, regulated industries</td></tr>
+          <tr><td class="td-mono">EU AI Act High-Risk</td><td>cognitive-safety + epistemic-safety + empirical-safety</td><td class="td-muted">Art. 9 (Risk Mgmt), Art. 12 (Logging), Art. 13 (Transparency)</td><td class="td-muted">EU market, healthcare, financial services</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ─── ARTICLE VIII: ENHANCEMENTS ──────────────────────────── -->
+<div class="article" id="enhancements">
+  <div class="article-eyebrow">Article VIII — Enhancement Registry</div>
+  <h2 class="article-title">Stakeholder review.<br><em>Integrated.</em></h2>
+  <p class="article-lead">All Essential and Table Stakes enhancements from the three-stakeholder dialectical review are incorporated into the series structure above. This section is the authoritative registry of the enhancement record.</p>
+
+  <div class="tier-section">
+    <div class="tier-header">
+      <span class="tier-badge essential">Essential</span>
+      <span style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace">Required for viability — all integrated into Series A–C</span>
+    </div>
+    <div class="enhancement-item">
+      <div class="enh-id">E1 — Guardian Interception Mechanism</div>
+      <div class="enh-title">Define the Claude Code enforcement boundary as LCI, not git hooks</div>
+      <div class="enh-desc">Resolved in Article VI. Linear Context Injection at system-prompt level is the interception architecture. Pre-commit hooks are post-hoc checks only. MCP server wrapping is the alternative for tool-call agents.</div>
+      <div class="enh-meta"><span>Series C-1 + C-2</span><span>Raised by: All 3 stakeholders</span><span>Status: Integrated</span></div>
+    </div>
+    <div class="enhancement-item">
+      <div class="enh-id">E2 — Resolve STATUS.json Drift</div>
+      <div class="enh-title">Pre-Series A-0 gate: truth surface must not show drift at series open</div>
+      <div class="enh-desc">Series A cannot open while cross_repo_consistency shows drift. This is a hard precondition. The A-0 housekeeping step resolves it before any constitutional rewrite begins.</div>
+      <div class="enh-meta"><span>Pre-Series A-0</span><span>Raised by: All 3 stakeholders</span><span>Status: Integrated as gate</span></div>
+    </div>
+    <div class="enhancement-item">
+      <div class="enh-id">E3 — Rollback Anchoring for Series A</div>
+      <div class="enh-title">Tag before rewrite. Run full verification suite. Define rollback procedure.</div>
+      <div class="enh-desc">THE_LIVING_CONSTITUTION.md is SHA-256 hashed by the evidence ledger. Rewriting it cascades through evidence_ledger.py and governance_connector.py. Rollback anchor tag required before A-1. Full verification suite (not just frontmatter validation) required after.</div>
+      <div class="enh-meta"><span>Series A — pre-A-1</span><span>Raised by: Solo Founder, Safety Lead</span><span>Status: Integrated</span></div>
+    </div>
+    <div class="enhancement-item">
+      <div class="enh-id">E4 — Separate Codex/Gemini from Series C Closure</div>
+      <div class="enh-title">Series C closes on Claude Guardian only. Codex/Gemini are adapter SPECS, not implementations.</div>
+      <div class="enh-desc">Series C gate requires Claude Guardian working end-to-end. Codex and Gemini adapter specifications (documents, not running code) are required for Series C closure but their implementation is Series C+.</div>
+      <div class="enh-meta"><span>Series C closure criteria</span><span>Raised by: Safety Lead, Solo Founder</span><span>Status: Integrated into dependency map</span></div>
+    </div>
+    <div class="enhancement-item">
+      <div class="enh-id">E5 — Regulatory Mappings in invariant-registry.json</div>
+      <div class="enh-title">Each invariant carries a machine-readable standards_alignment field during Series A</div>
+      <div class="enh-desc">The constitutional refactor is the right moment to promote standards-alignment.md from prose to machine-parseable. Each invariant entry gets standards_alignment: {nist_ai_rmf: [...], iso_42001: [...], eu_ai_act: [...]}. Seen in domain packs table above.</div>
+      <div class="enh-meta"><span>Series A-1 (invariant-registry.json)</span><span>Raised by: Enterprise Buyer</span><span>Status: Integrated</span></div>
+    </div>
+    <div class="enhancement-item">
+      <div class="enh-id">E6 — Guardian Distribution Mechanism</div>
+      <div class="enh-title">PyPI package + GitHub Action. Extractable without cloning TLC.</div>
+      <div class="enh-desc">Resolved in Article VI. pip install tlc-guardian. GitHub Action alternative. Both extractable without the full TLC repo — matching the tlc-governance-kit/ extraction precedent.</div>
+      <div class="enh-meta"><span>Series C-1</span><span>Raised by: Enterprise Buyer, Safety Lead</span><span>Status: Integrated</span></div>
+    </div>
+  </div>
+
+  <div class="tier-section">
+    <div class="tier-header">
+      <span class="tier-badge table-stakes">Table Stakes</span>
+      <span style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace">Expected in a production-ready version — all integrated or scheduled</span>
+    </div>
+    <div class="enhancement-item">
+      <div class="enh-id">T1 — Root Artifact Cleanup</div>
+      <div class="enh-desc">Archive crsp_refactor_bundle_final/, _c-rsp/, delegated-whistling-cherny.md, ChatGPT-AI Governance Frameworks.md as Pre-Series A-0. Not in ROOT_DOC_ALLOWLIST.md.</div>
+      <div class="enh-meta"><span>A-0</span><span>Solo Founder + Enterprise Buyer</span></div>
+    </div>
+    <div class="enhancement-item">
+      <div class="enh-id">T2 — Effort Estimates (S/M/L) Per Step</div>
+      <div class="enh-desc">All series steps carry effort estimates to enable session-level planning for a solo contributor. See ROADMAP.md.</div>
+      <div class="enh-meta"><span>ROADMAP.md</span><span>Solo Founder + Enterprise Buyer</span></div>
+    </div>
+    <div class="enhancement-item">
+      <div class="enh-id">T3 — Guardian Threat Model</div>
+      <div class="enh-desc">Guardian verifies integrity (SHA-256) of its own config before making enforcement decisions. Implemented in guardian.py _verify_config_integrity() shown in Article VI.</div>
+      <div class="enh-meta"><span>Series C-1</span><span>Safety Lead</span></div>
+    </div>
+    <div class="enhancement-item">
+      <div class="enh-id">T4 — Scripted registry.json Migration</div>
+      <div class="enh-desc">B-2 seeded by script from MASTER_PROJECT_INVENTORY.json — generated-then-reviewed, not manual. Pattern follows existing sync_master_project_inventory_from_projects.py.</div>
+      <div class="enh-meta"><span>Series B-2</span><span>Solo Founder</span></div>
+    </div>
+    <div class="enhancement-item">
+      <div class="enh-id">T5 — Exportable Evidence Records</div>
+      <div class="enh-desc">Guardian violation evidence records are standalone JSON files — usable in audit reports without TLC repo access. Extends epistemic-closure architecture to external consumers.</div>
+      <div class="enh-meta"><span>Series C — evidence record format</span><span>Enterprise Buyer + Safety Lead</span></div>
+    </div>
+    <div class="enhancement-item">
+      <div class="enh-id">T6 — ROADMAP.md</div>
+      <div class="enh-desc">Public artifact mapping series to quarters with release cadence. Required for enterprise evaluation. Stabilizes the development timeline signal for potential contributors.</div>
+      <div class="enh-meta"><span>Root artifact</span><span>Enterprise Buyer</span></div>
+    </div>
+    <div class="enhancement-item">
+      <div class="enh-id">T7 — config/domains.ts → .json Migration Dependency</div>
+      <div class="enh-desc">B-3 must note the undeclared cross-series dependency: apps/tlc-control-plane/ imports from the .ts file. Series E must update the import after B-3 migrates to JSON.</div>
+      <div class="enh-meta"><span>Series B-3 note</span><span>Solo Founder</span></div>
+    </div>
+  </div>
+
+  <div class="tier-section">
+    <div class="tier-header">
+      <span class="tier-badge hva">HVA Backlog</span>
+      <span style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace">Future series candidates — deferred, not abandoned</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>ID</th><th>Enhancement</th><th>Extends</th><th>Raised By</th></tr></thead>
+        <tbody>
+          <tr><td class="td-mono">H1</td><td>Publish invariant-registry.json as standalone versioned artifact with stable URL. Makes invariants citable in audit reports.</td><td class="td-muted">Series B → stable URL at close</td><td class="td-muted">Safety Lead + Enterprise Buyer</td></tr>
+          <tr><td class="td-mono">H2</td><td>Guardian Lite advisory/linter mode as initial adoption path. Logs violations without blocking.</td><td class="td-muted">Series C-1 → integrated as mode</td><td class="td-muted">Safety Lead + Enterprise Buyer</td></tr>
+          <tr><td class="td-mono">H3</td><td>series_progress object in STATUS.json tracking open series, completed steps, next action. Machine-readable program state.</td><td class="td-muted">Series A-1 (STATUS.json schema)</td><td class="td-muted">Solo Founder</td></tr>
+          <tr><td class="td-mono">H4</td><td>SOC 2 Type II + NIST AI RMF compliance starter kit as Series D commercial entry. Fastest path to enterprise paid adoption.</td><td class="td-muted">Series D+ commercial packs</td><td class="td-muted">Enterprise Buyer</td></tr>
+          <tr><td class="td-mono">H5</td><td>Guardian MVP as single guardian.py before promoting to package. jail.py pattern as proof.</td><td class="td-muted">Series C-1 → already adopted</td><td class="td-muted">Solo Founder</td></tr>
+          <tr><td class="td-mono">H6</td><td>Static compliance posture JSON endpoint generated by CI. Enterprise auditor-accessible without repo access.</td><td class="td-muted">Series E → CI artifact</td><td class="td-muted">Enterprise Buyer</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ─── ARTICLE IX: ANTHROPIC ALIGNMENT ──────────────────────── -->
+<div class="article" id="anthropic">
+  <div class="article-eyebrow">Article IX — Anthropic Alignment</div>
+  <h2 class="article-title">Safety research,<br><em>made executable.</em></h2>
+  <p class="article-lead">TLC is not described as a Constitutional AI system — it is an executable instantiation of the principles Constitutional AI established. The alignment is structural, not lexical. Every core TLC component maps to a specific Anthropic research contribution.</p>
+
+  <div class="subsection">
+    <div class="sub-title">Structural Correspondence Map</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>TLC Component</th><th>Anthropic Equivalent</th><th>Correspondence</th></tr></thead>
+        <tbody>
+          <tr><td class="td-mono">invariant-registry.json</td><td class="td-muted">Constitutional AI principles list — the "constitution" that governs agent critique and revision</td><td class="td-muted">Exact: machine-parseable rules as the sole human oversight mechanism</td></tr>
+          <tr><td class="td-mono">Guardian mode (check → allow/block)</td><td class="td-muted">Constitutional Classifiers++ — two-stage probe + classifier architecture</td><td class="td-muted">Structural: build-time enforcement vs runtime classification, same allow/block semantics</td></tr>
+          <tr><td class="td-mono">INVARIANT_05 (desperation monitoring)</td><td class="td-muted">Emotion research (Apr 2026) — desperation vector as early-warning signal</td><td class="td-muted">Exact: first system to operationalize Anthropic's monitoring recommendation</td></tr>
+          <tr><td class="td-mono">Series A–E dependency-locked gates</td><td class="td-muted">Responsible Scaling Policy — invariant-based binary audit criteria (Fully/Mostly/Not in place)</td><td class="td-muted">Structural: same binary-verifiable gate model applied to governance program execution</td></tr>
+          <tr><td class="td-mono">Self-hosting principle</td><td class="td-muted">Frontier Safety Roadmap alignment assessments — systematic evaluation against the Constitution's spirit</td><td class="td-muted">Exact: TLC's own build is the alignment assessment for TLC's governance</td></tr>
+          <tr><td class="td-mono">C-RSP generator-evaluator separation</td><td class="td-muted">Harness design (Mar 2026) — generator-evaluator separation as core architectural lever</td><td class="td-muted">Structural: agent doing governance work separated from agent evaluating governance quality</td></tr>
+          <tr><td class="td-mono">STATUS.json truth surface</td><td class="td-muted">Anthropic's "provable inference" roadmap goal — signing model outputs attributably</td><td class="td-muted">Partial: truth surface provides attributability; cryptographic signing is Series D+ extension</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Alignment Audit — Anthropic Epistemic Standards</div>
+    <div class="alignment-grid">
+      <div class="align-card">
+        <div class="align-standard">Standard A — Show Don't Tell</div>
+        <div class="align-verdict verdict-partial">PARTIAL → PASS with integrations</div>
+        <div class="align-note">Self-hosting is the empirical claim. The evidence ledger produces machine-verifiable proof. sentinelos' 994 LOC test suite is the "show." The 3-lens review failures are the acknowledged gaps.</div>
+      </div>
+      <div class="align-card">
+        <div class="align-standard">Standard B — Safety Hierarchy</div>
+        <div class="align-verdict verdict-pass">PASS</div>
+        <div class="align-note">INVARIANT_03 (Safety Over Fluency) encodes the priority ordering. INVARIANT_06 (Self-hosting) ensures the system doesn't undermine its own oversight mechanisms.</div>
+      </div>
+      <div class="align-card">
+        <div class="align-standard">Standard C — Epistemic Humility</div>
+        <div class="align-verdict verdict-partial">PARTIAL</div>
+        <div class="align-note">TLC claims governance capability without sufficiently hedging on alignment completeness. Recommended translation: "TLC provides best-practice governance infrastructure under current empirical understanding" not "TLC solves agent governance."</div>
+      </div>
+      <div class="align-card">
+        <div class="align-standard">Standard D — Emotion Architecture</div>
+        <div class="align-verdict verdict-pass">PASS (with INVARIANT_05)</div>
+        <div class="align-note">INVARIANT_05 operationalizes Anthropic's April 2026 finding. Guardian Lite monitors context-anxiety signatures as desperation-vector proxies before blocking mode engages.</div>
+      </div>
+      <div class="align-card">
+        <div class="align-standard">Standard E — Generator-Evaluator Separation</div>
+        <div class="align-verdict verdict-pass">PASS</div>
+        <div class="align-note">C-RSP build contracts separate the agent doing work from the governance layer evaluating it. Series A-0 through E have explicit closure criteria — the evaluator standard is baked in.</div>
+      </div>
+      <div class="align-card">
+        <div class="align-standard">Standard F — Invariant Verifiability</div>
+        <div class="align-verdict verdict-partial">PARTIAL → PASS post-E5</div>
+        <div class="align-note">With regulatory mappings added (E5) and exportable evidence records (T5), invariants become independently auditable. Pre-E5: not fully binary-verifiable by third parties without TLC context.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Canonical Anthropic-Register Positioning</div>
+    <div class="pitch-block">
+      <p class="pitch-text">TLC provides governance infrastructure for frontier coding agents under current empirical understanding of alignment — which remains incomplete. It enforces constitutional constraints at build time, monitors for functional emotional-state anomalies that Anthropic research has shown to causally precede misaligned behavior, and maintains an evidence ledger that makes governance claims auditable rather than merely asserted. The system governs its own development under the same invariants it enforces externally, providing the kind of empirical self-consistency that "show don't tell" safety research requires. TLC does not solve the alignment problem. It reduces the surface area over which that problem can express itself, and does so in a way that is verifiable, portable, and self-hosting.</p>
+      <div class="pitch-source">// Anthropic-register positioning — epistemic humility preserved</div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── ARTICLE X: ROADMAP ────────────────────────────────────── -->
+<div class="article" id="roadmap">
+  <div class="article-eyebrow">Article X — Roadmap</div>
+  <h2 class="article-title">The sequence<br>is <em>non-negotiable.</em></h2>
+  <p class="article-lead">The roadmap follows the C-RSP dependency chain. No series is assigned a calendar date — series close when their binary criteria are met, not when a deadline arrives. Time estimates are effort-based, not calendar-based.</p>
+
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-label">Now — Pre-Series A-0</div>
+      <div class="tl-title">Housekeeping Gate [S — 2–4 hours]</div>
+      <div class="tl-desc">Resolve STATUS.json drift. Archive legacy root artifacts. Tag rollback anchor. series_progress added to STATUS.json schema. ROADMAP.md created at root.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-label">Series A — Constitutional Refactor [L — 2–3 weeks]</div>
+      <div class="tl-title">Grammar: Formal constitutional vocabulary</div>
+      <div class="tl-desc">Rewrite THE_LIVING_CONSTITUTION.md (machine-parseable Articles). Rewrite root CLAUDE.md (overlay architecture). Extend TERMINOLOGY.md (5 new constitutional terms). Add regulatory mappings to invariant-registry.json. Amendment record A-001.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-label">Series B — Taxonomy Topography [M — 1–2 weeks]</div>
+      <div class="tl-title">Linker: Machine-readable governance registry</div>
+      <div class="tl-desc">Create JSON Schema. Seed registry.json from inventory script. Migrate domains.ts → domains.json. Wire verify_registry_schema.py to CI. Register all 12 portfolio repos with domain_bindings and evidence_paths.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-label">Series C — Guardian Mode MVP [L — 3–4 weeks]</div>
+      <div class="tl-title">Runtime: Constitutional enforcement layer</div>
+      <div class="tl-desc">guardian.py wrapping sentinelos kernel. LCI Claude adapter. INVARIANT_05 emotion monitoring. PyPI distribution. Codex + Gemini adapter specs. Export evidence record format. Guardian Lite advisory mode.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-label">Series D — Domain Packs [M — 2 weeks]</div>
+      <div class="tl-title">Standard library: Composable invariant modules</div>
+      <div class="tl-desc">universal-core pack. Human Safety (uicare). Cognitive Safety (instructional-integrity). Empirical Safety (consentchain). Pack template. SOC 2 + NIST AI RMF commercial starter kits.</div>
+    </div>
+    <div class="tl-item future">
+      <div class="tl-label">Series E — Constitutional UI [L — 3–4 weeks]</div>
+      <div class="tl-title">IDE: Governed read-only control plane</div>
+      <div class="tl-desc">Promote apps/tlc-control-plane/ to governed product. Registry browser. Pack status visualization. Compliance posture CI artifact. Governed by Guardian mode. Runs through sandbox substrate.</div>
+    </div>
+    <div class="tl-item future">
+      <div class="tl-label">Post-Series E — Commercial</div>
+      <div class="tl-title">Finance/healthcare domain packs. Enterprise SLA. Managed hosting.</div>
+      <div class="tl-desc">Bus-factor mitigation (contributor program). Versioned invariant-registry.json stable URL. Static compliance posture JSON endpoint. Research publication (self-hosting proof, emotion vector monitoring).</div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── ARTICLE XI: SUCCESS METRICS ──────────────────────────── -->
+<div class="article" id="metrics">
+  <div class="article-eyebrow">Article XI — Success Metrics</div>
+  <h2 class="article-title">Binary criteria.<br><em>No ambiguity.</em></h2>
+  <p class="article-lead">TLC measures success the way it governs agents: with binary-verifiable criteria, not soft targets. These metrics apply Anthropic's invariant audit model to TLC's own product development.</p>
+
+  <div class="subsection">
+    <div class="sub-title">Series Closure Metrics</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Series</th><th>Binary Closure Criterion</th><th>Verification Command</th></tr></thead>
+        <tbody>
+          <tr><td class="td-mono">A-0</td><td>STATUS.json shows no drift. Legacy artifacts archived. Rollback tag exists.</td><td class="td-muted">verify_document_constitution.py --root . exits 0</td></tr>
+          <tr><td class="td-mono">A</td><td>machine-parseable Domain/Jurisdiction/Institution/Project/Truth Surface in THE_LIVING_CONSTITUTION.md</td><td class="td-muted">compliance_score_docs.py --root . exits 0</td></tr>
+          <tr><td class="td-mono">B</td><td>Every slug in MASTER_PROJECT_INVENTORY.json has schema-valid registry.json entry</td><td class="td-muted">verify_registry_schema.py exits 0</td></tr>
+          <tr><td class="td-mono">C</td><td>Guardian blocks simulated violation AND produces exportable evidence record</td><td class="td-muted">verify_guardian_mode.py exits 0</td></tr>
+          <tr><td class="td-mono">D</td><td>universal-core + 2 domain packs pass Guardian integration tests</td><td class="td-muted">pytest packages/tlc-guardian/tests/packs/ exits 0</td></tr>
+          <tr><td class="td-mono">E</td><td>npm run build exits 0 AND UI renders live STATUS.json AND build passes Guardian enforcement</td><td class="td-muted">npm run build + e2e test suite exits 0</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Research Community Metrics</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Metric</th><th>Target</th><th>Timeline</th></tr></thead>
+        <tbody>
+          <tr><td>First paper operationalizing Anthropic emotion vector monitoring in a governance system</td><td class="td-muted">Submitted to AI safety venue</td><td class="td-muted">Post-Series C</td></tr>
+          <tr><td>invariant-registry.json versioned artifact with stable URL and external citation</td><td class="td-muted">1 external citation</td><td class="td-muted">Post-Series B</td></tr>
+          <tr><td>Self-hosting proof documented as reproducible experiment</td><td class="td-muted">README walkthrough passable by unfamiliar developer</td><td class="td-muted">Post-Series A (Blind Man's Test)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Market Metrics</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Metric</th><th>Target</th><th>Dependency</th></tr></thead>
+        <tbody>
+          <tr><td>Guardian Lite adoptions (advisory mode)</td><td class="td-muted">10 external repos using tlc-guardian</td><td class="td-muted">Series C PyPI release</td></tr>
+          <tr><td>Enterprise compliance evaluation conversations</td><td class="td-muted">3 qualified enterprise prospects</td><td class="td-muted">Series D SOC 2 starter kit</td></tr>
+          <tr><td>First paid enterprise customer</td><td class="td-muted">$50k ARR</td><td class="td-muted">Series D + exportable evidence format</td></tr>
+          <tr><td>Anthropic internal acknowledgment or research collaboration inquiry</td><td class="td-muted">1 Anthropic research team contact</td><td class="td-muted">Emotion vector paper submission</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-label">The Ultimate Test</div>
+    <p>A competent developer who has never seen the TLC repo can execute Series A through C using only this PRD, the repository README, and public documentation for named external standards. If they cannot, the PRD is incomplete. This is the Blind Man's Test applied to the PRD itself.</p>
+  </div>
+</div>
+
+</div><!-- end main-col -->
+</div><!-- end page -->
+
+<!-- ═══ FOOTER ════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="doc-footer">
+    <div class="footer-left">
+      THE LIVING CONSTITUTION — PRD v3.0<br>
+      Constitutional governance for frontier coding agents<br>
+      <span style="color:var(--muted)">Amendment record: A-001 through A-006 incorporated</span>
+    </div>
+    <div class="footer-right">
+      Corey Alejandro · coreyalejandro.com<br>
+      github.com/coreyalejandro/the-living-constitution<br>
+      <span style="color:var(--muted)">April 2026 · Status: Active</span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
